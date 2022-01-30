@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 
 
 within_bounds = lambda pos, prev_pos, env : \
@@ -39,26 +40,36 @@ def a_star( env,
         current_pos = current_node[0]
         prev_pos = current_node[1]
         current_d = current_node[3]
-        for (x,y) in [(-1,0), (1,0), (0,-1), (0,1)]:
+        for (x,y) in [(-1,0), (1,0), (0,-1), (0,1), (-1,1), (1,1), (-1,-1), (1,1)]:
 
             new_pos = (current_pos[0]+x, current_pos[1]+y)
 
             if (    passable(new_pos, current_pos, env) and 
                     not (new_pos in visited_nodes.keys())):
-                new_d = distance_heuristic(new_pos, start)
+                
+                dist = (1.4142  if ((x*x + y*y) == 2) else 1) 
+                new_d = current_d + dist
                 new_h = distance_heuristic(new_pos, end)
                 new_f = new_d+new_h
 
                 new_node = (new_pos, current_pos, new_f, new_d)
-                ##print(visited_nodes.keys())
-                queue_nodes = [node for node in node_queue if node[0] == new_node[0]]
-                for old_queue_node in queue_nodes:
-                    if old_queue_node[2] < new_node[2]: continue 
+
                 
-                if (new_node in node_queue): continue
-
-                add_inplace_sorted_f(new_node, node_queue)
-
+                add = True
+                ##print(visited_nodes.keys())
+                for (idx, node) in enumerate(node_queue):
+                    #check if the nodes are going to the same pos
+                    if (node[0] == new_node[0]):
+                        # old node distance lower, don't add new node
+                        if (node[3] < new_node[3]): 
+                            add = False
+                            break
+                        # new node distance lower, remove old node
+                        else: 
+                            node_queue.pop(idx)
+               
+                if (add): 
+                    add_inplace_sorted_f(new_node, node_queue)
         visited_nodes[current_pos] = prev_pos 
         if (len(node_queue) > 0): current_node = node_queue.pop(0)
         else: return []
@@ -111,14 +122,16 @@ def link_path(node_dict, start, end):
 if __name__ == "__main__":
     #test_add_inplace()
 
-    env = np.random.rand(40, 200)
+    env = np.asarray(Image.open("test_env2.png").convert("L"))
+
+    print(env.shape)
 
     start = (1,1)
-    end = (20, 90)
+    end = (99, 99)
     path = a_star(env, start, end, passable = lambda pos, prev_pos, env :\
                                     within_bounds(pos, prev_pos, env) and
-                                    env[pos[0], pos[1]] < 0.65)
-    for node in path:
-        env[node[0], node[1]] = 1
+                                    env[pos[0], pos[1]] > 200)
+    for (i, node) in enumerate(path):
+        env[node[0], node[1]] = 120
     plt.imshow(env)
     plt.show()
