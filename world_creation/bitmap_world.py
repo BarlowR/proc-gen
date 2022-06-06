@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 from PIL import Image
 
-from ..noise import perlin_noise as perlin_noise
-import trains.train_builder as train_builder
+from noise import perlin_noise as perlin_noise
+from world_creation.trains import train_builder as train_builder
 
 def rand_proc_num_map(h):
     return np.array([[p[(p[j]+p[i]+j)%256] for j, height in enumerate(row)] for i, row in enumerate(h)])
