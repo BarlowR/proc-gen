@@ -6,7 +6,7 @@ import numpy as np
 import world_creation.bitmap_world as bmw
 
 
-#build a 4*4 isometric grid by sequentially selecting verions of the passed sprite 
+#build a n8n isometric grid with height and sprite type given by perlin noise 
 def build_grid(sprite, side_len):
 
     sprite_dims = sprite[0].shape
