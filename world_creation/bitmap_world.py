@@ -8,7 +8,6 @@ from PIL import Image
 from ..noise import perlin_noise as perlin_noise
 import trains.train_builder as train_builder
 
-
 def rand_proc_num_map(h):
     return np.array([[p[(p[j]+p[i]+j)%256] for j, height in enumerate(row)] for i, row in enumerate(h)])
 
@@ -18,7 +17,7 @@ def plot_3d(map, fig):
     ax = fig.gca(projection="3d")
     ax.set_zlim3d([-1, 5])
     ax.plot_surface(x, y, map ,rstride=1, cstride=1, cmap=plt.cm.gray, linewidth=0)
-    
+
 
 #generate a world map with given parameters
 def world_gen(size, offset = [0,0], rock_elev = 0.75, rock_scale = .1, water_elev = 0.2, scale = 1):
