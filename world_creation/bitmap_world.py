@@ -3,16 +3,13 @@ from pickletools import uint8
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-import random
-import time
 from PIL import Image
 
-import a_star
-import perlin_noise
-import train_builder
+from ..noise import perlin_noise as perlin_noise
+import trains.train_builder as train_builder
 
 
-def rand_num_map(h):
+def rand_proc_num_map(h):
     return np.array([[p[(p[j]+p[i]+j)%256] for j, height in enumerate(row)] for i, row in enumerate(h)])
 
 def plot_3d(map, fig):
@@ -21,9 +18,9 @@ def plot_3d(map, fig):
     ax = fig.gca(projection="3d")
     ax.set_zlim3d([-1, 5])
     ax.plot_surface(x, y, map ,rstride=1, cstride=1, cmap=plt.cm.gray, linewidth=0)
+    
 
-
-
+#generate a world map with given parameters
 def world_gen(size, offset = [0,0], rock_elev = 0.75, rock_scale = .1, water_elev = 0.2, scale = 1):
     map_layers = {  2:1,
                     4:3,
@@ -55,6 +52,7 @@ def world_gen(size, offset = [0,0], rock_elev = 0.75, rock_scale = .1, water_ele
     return map
 
 
+# a naive convolutional kernal operation implementation
 def naive_convolution(map, kernel_lambda, kernel_shape = (3,3)):
     y_start = int((kernel_shape[0]-1)/2)
     x_start = int((kernel_shape[1]-1)/2)
@@ -67,17 +65,20 @@ def naive_convolution(map, kernel_lambda, kernel_shape = (3,3)):
 def smoothing_kernel(sample):
     return (np.sum(sample)/np.size(sample))
 
+# gradient lambda
 def green_grad(h): #h 0-1
     return [10 + h*10, 55 + h*200, 40 + h* 30]
 
+# gradient lambda
 def blue_grad(d): #d 0-1 where 1 is surface
     d = np.sqrt(d)
     return [10 + d*10, 10 + d*30, d* 200]
 
+# gradient lambda
 def peaks(h):
     return [150+h*100]
 
-
+#build a color map from a height map, a list of tracks & stations, and rock/water elevations
 def color_builder(map, tracks = [], stations = [], rock_elev = 0.75, water_elev = 0.2):
     map = np.asarray(map)
     color_map = np.zeros((map.shape[0], map.shape[1], 3), dtype="uint8")
@@ -104,6 +105,9 @@ def image_from_map(map, tracks = [], stations = [], rock_elev = 0.75, water_elev
     colormap = color_builder(map, tracks = tracks, stations = stations,rock_elev = rock_elev, water_elev = water_elev)
     img = Image.fromarray(colormap).transpose(Image.TRANSPOSE)
     return img
+
+
+
 
 if __name__ == "__main__":
     np.random.seed(1250)
