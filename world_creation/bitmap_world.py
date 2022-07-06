@@ -104,27 +104,3 @@ def image_from_map(map, tracks = [], stations = [], rock_elev = 0.75, water_elev
     colormap = color_builder(map, tracks = tracks, stations = stations,rock_elev = rock_elev, water_elev = water_elev)
     img = Image.fromarray(colormap).transpose(Image.TRANSPOSE)
     return img
-
-
-
-
-if __name__ == "__main__":
-    np.random.seed(1250)
-    size = ([1200, 600])
-    rock_elev = 0.75
-    water_elev = .35
-
-    map = world_gen(size, rock_elev = rock_elev, water_elev = water_elev, scale=.3)
-    map = naive_convolution(map, smoothing_kernel)  
-    map = naive_convolution(map, smoothing_kernel)     
-
-    
-    stations, tracks = train_builder.train_network(map, 20)
-    print(stations)
-    img = image_from_map(map, tracks = tracks, stations = stations, rock_elev = rock_elev, water_elev = water_elev)
-    img.save("map.png")
-    img.show()
-    #plot_3d(map, plt.figure())
-    #plt.imshow(map)
-    #plt.show()
-np.math.pi/2
